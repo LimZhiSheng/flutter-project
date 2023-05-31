@@ -10,120 +10,136 @@ class OnboardingPage extends StatefulWidget {
 }
 
 Widget buildPage({
-  required Color color,
   required String urlImage,
-  required String title,
   required String subtitle,
+  required double  subtitleFontSize,
 }) =>
-    Container(
-        color: color,
-        child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-          Expanded(
-            child: Image.asset(
-              urlImage,
-              fit: BoxFit.cover,
-              width: double.infinity,
+    Scaffold(
+        body: Center(
+      child: Padding(
+        padding: const EdgeInsets.all(40),
+        child: SizedBox(
+          width: 500,
+          height: 500,
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(20),
+            child: Container(
+              color: Colors.green.shade100,
+              child: Column(
+                children: [
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(20),
+                    child: Padding(
+                      padding: const EdgeInsets.all(10.0),
+                      child: Image.asset(
+                        urlImage,
+                        width: 300, // Adjust the width of the image
+                        height: 300, // Adjust the height of the image
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: 20),
+                  Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8),
+                      child: Text(
+                        subtitle,
+                        textAlign: TextAlign.center,
+                        style:  TextStyle(
+                          color: Colors.green,
+                          fontSize: subtitleFontSize,
+                        ),
+                      )),
+                ],
+              ),
             ),
           ),
-          const SizedBox(height: 24),
-          Text(title,
-              style: TextStyle(
-                color: Colors.teal.shade700,
-                fontSize: 32,
-                fontWeight: FontWeight.bold,
-              )),
-          const SizedBox(height: 24),
-          Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8),
-              child: Text(
-                subtitle,
-                style: const TextStyle(color: Colors.green),
-              )),
-        ]));
+        ),
+      ),
+    ));
 
 class OnboardingPageState extends State<OnboardingPage> {
   PageController pageController = PageController();
-  bool isLastPage = false;
+  int currentPage = 0;
+  
   @override
   Widget build(BuildContext context) => Scaffold(
-        body: Padding(
-          padding: const EdgeInsets.only(bottom: 80),
+    body: Column(
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      children: [
+        SizedBox(
+          height: 500,
           child: PageView(
             controller: pageController,
-            onPageChanged: (index) => {setState(() => isLastPage = index == 2)},
+            onPageChanged: (index) {
+              setState(() {
+                currentPage = index;
+              });
+            },
             children: [
               buildPage(
-                  color: Colors.green.shade100,
-                  urlImage: 'assets/page1.jpg',
-                  title: 'page 1',
-                  subtitle: "this is the subtitle page"),
+                urlImage: 'assets/page1.jpg',
+                subtitle: "Welcome ~ !",
+                subtitleFontSize: 26,
+              ),
               buildPage(
-                  color: Colors.green.shade100,
-                  urlImage: 'assets/page2.jpg',
-                  title: 'page 2',
-                  subtitle: "this is the subtitle page"),
+                urlImage: 'assets/page2.jpg',
+                subtitle: "Our system will show the recorded attendance for you in an intuitive way!",
+                subtitleFontSize: 20,
+              ),
               buildPage(
-                  color: Colors.green.shade100,
-                  urlImage: 'assets/page3.jpg',
-                  title: 'page 3',
-                  subtitle: "this is the subtitle page"),
+                urlImage: 'assets/page3.jpg',
+                subtitle: "Not only that, you can add new attendance using our system ~",
+                subtitleFontSize: 20,
+              ),
             ],
           ),
         ),
-        bottomSheet: isLastPage
-            ? TextButton(
-                style: TextButton.styleFrom(
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8)),
-                  foregroundColor: Colors.white,
-                  backgroundColor: Colors.teal.shade700,
-                  minimumSize: const Size.fromHeight(80),
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 8),
+          height: 80,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              if (currentPage != 2)
+                Expanded(
+                  child: Align(
+                    alignment: Alignment.center,
+                    child: SmoothPageIndicator(
+                      controller: pageController,
+                      count: 3,
+                      effect: WormEffect(
+                        spacing: 16,
+                        dotColor: Colors.black26,
+                        activeDotColor: Colors.teal.shade700,
+                      ),
+                      onDotClicked: (index) => pageController.animateToPage(
+                        index,
+                        duration: const Duration(milliseconds: 500),
+                        curve: Curves.easeIn,
+                      ),
+                    ),
+                  ),
                 ),
-                child: const Text('Get Started'),
-                onPressed: () async {
-                  Navigator.of(context).pushReplacement(MaterialPageRoute(
-                    builder: (context) => const AttendanceListScreen(),
-                  ));
-                },
-              )
-            : Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8),
-                height: 80,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    TextButton(
-                      child: const Text('SKIP'),
-                      onPressed: () => pageController.animateToPage(
-                        2,
-                        duration: const Duration(milliseconds: 500),
-                        curve: Curves.easeInOut,
-                      ),
+              if (currentPage == 2)
+                Expanded(
+                  child: Align(
+                    alignment: Alignment.center,
+                    child: ElevatedButton(
+                      child: Text('Start'),
+                      onPressed: () async {
+                        Navigator.of(context).pushReplacement(
+                          MaterialPageRoute(
+                            builder: (context) => const AttendanceListScreen(),
+                          ),
+                        );
+                      },
                     ),
-                    Center(
-                      child: SmoothPageIndicator(
-                        controller: pageController,
-                        count: 3,
-                        effect: WormEffect(
-                          spacing: 16,
-                          dotColor: Colors.black26,
-                          activeDotColor: Colors.teal.shade700,
-                        ),
-                        onDotClicked: (index) => pageController.animateToPage(
-                          index,
-                          duration: const Duration(milliseconds: 500),
-                          curve: Curves.easeIn,
-                        ),
-                      ),
-                    ),
-                    TextButton(
-                      child: const Text('NEXT'),
-                      onPressed: () => pageController.nextPage(
-                        duration: const Duration(milliseconds: 500),
-                        curve: Curves.easeInOut,
-                      ),
-                    ),
-                  ],
-                )),
-      );
+                  ),
+                ),
+            ],
+          ),
+        ),
+      ],
+    ),
+  );
 }
