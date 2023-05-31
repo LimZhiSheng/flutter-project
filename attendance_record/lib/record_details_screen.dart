@@ -16,9 +16,62 @@ class RecordDetailsScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('User: ${record.user}'),
-            Text('Time: ${record.time}'),
-            if (record.phone != null) Text('Phone: ${record.phone}'),
+            Center(
+              child: CircleAvatar(
+                radius:50,
+                backgroundColor: Colors.blue,
+                child: Text(
+                  record.user.substring(0, 1).toUpperCase(),
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize:26,
+                    ),
+                  ),
+                ),
+            ),
+            Divider(
+              height:90,
+              color:Colors.grey[800],
+            ),
+            const Text('USER:',
+            style:TextStyle(
+              letterSpacing: 2.0,
+              color:Colors.grey,
+            ),),
+            SizedBox(height:10),
+            Text('${record.user}',
+            style:TextStyle(
+              fontSize:26,
+              fontWeight:FontWeight.bold,
+
+            ),),
+            SizedBox(height:10),
+            Text('TIME:',
+            style:TextStyle(
+              letterSpacing: 2.0,
+              color:Colors.grey,
+            ),),
+            SizedBox(height:10),
+            Text('${record.time}',
+            style:TextStyle(
+              fontSize:26,
+              fontWeight:FontWeight.bold,
+
+            ),),
+            SizedBox(height:10),
+            Text('PHONE:',
+            style:TextStyle(
+              letterSpacing: 2.0,
+              color:Colors.grey,
+            ),),
+            SizedBox(height:10),
+            Text('${record.phone}',
+            style:TextStyle(
+              fontSize:26,
+              fontWeight:FontWeight.bold,
+
+            ),),
+            SizedBox(height:10),
             IconButton(
               icon: const Icon(Icons.share),
               onPressed: () {

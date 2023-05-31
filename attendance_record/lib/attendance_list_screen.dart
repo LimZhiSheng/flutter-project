@@ -22,12 +22,24 @@ class AttendanceListScreenState extends State<AttendanceListScreen> {
   final formKey = GlobalKey<FormState>();
   String username = " ";
   String phone = " ";
+  late SharedPreferences prefs;
 
   @override
   void initState() {
     super.initState();
+    initPreferences();
     loadAttendance();
+    _scrollController.addListener(() {
+      _scrollListener();
+    });
   }
+
+  void initPreferences() async {
+  prefs = await SharedPreferences.getInstance();
+  setState(() {
+    changeTimeFormat = prefs.getBool('timeFormat') ?? false;
+  });
+}
 
   void loadAttendance() async {
     String jsonData =
@@ -42,7 +54,7 @@ class AttendanceListScreenState extends State<AttendanceListScreen> {
       );
     }).toList();
 
-    attendanceRecords.sort((a, b) => a.user.compareTo(b.user));
+     attendanceRecords.sort((a, b) => a.time.compareTo(b.time));
 
     setState(() {
       records = attendanceRecords;
@@ -55,14 +67,11 @@ class AttendanceListScreenState extends State<AttendanceListScreen> {
     List<AttendanceRecord> updatedRecords = List.from(records)
       ..insert(0, newRecord);
 
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    List<String> recordStrings =
-        updatedRecords.map((record) => json.encode(record.toJson())).toList();
+    prefs = await SharedPreferences.getInstance();
+    List<String> recordStrings = updatedRecords.map((record) {
+      return json.encode(record.toJson());
+    }).toList();
     await prefs.setStringList('attendance_records', recordStrings);
-
-    String jsonData = json.encode(recordStrings);
-    File jsonFile = File('data_set.json');
-    await jsonFile.writeAsString(jsonData);
 
     setState(() {
       records = updatedRecords;
@@ -148,6 +157,11 @@ class AttendanceListScreenState extends State<AttendanceListScreen> {
           if (value == null || value.isEmpty) {
             return 'Please enter correct phone';
           }
+
+          final numericRegex = RegExp(r'^[0-9]+$');
+          if (!numericRegex.hasMatch(value)) {
+            return 'Please enter a valid phone number';
+          }
           return null;
         },
         onChanged: (value) => setState(() => phone = value),
@@ -166,6 +180,7 @@ class AttendanceListScreenState extends State<AttendanceListScreen> {
             onPressed: () {
               setState(() {
                 changeTimeFormat = !changeTimeFormat;
+                prefs.setBool('timeFormat', changeTimeFormat);
               });
             },
           ),
@@ -193,6 +208,7 @@ class AttendanceListScreenState extends State<AttendanceListScreen> {
                   icon: const Icon(Icons.clear),
                   onPressed: () {
                     searchController.clear();
+                    setState(() {});
                   },
                 ),
               ),
